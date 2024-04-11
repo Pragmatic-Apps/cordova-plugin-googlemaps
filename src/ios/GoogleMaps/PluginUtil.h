@@ -48,7 +48,6 @@ typedef void (^MYCompletionHandler)(NSError *error);
 - (UIImage *)resize:(CGFloat)width height:(CGFloat)height;
 @end
 
-
 //
 // animationDidStop for group animation
 // http://stackoverflow.com/a/28051909/697856
