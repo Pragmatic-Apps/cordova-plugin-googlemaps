@@ -21,6 +21,10 @@ import java.util.List;
 public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
   private String polylineHashCode;
 
+  private String getPolylineHashCode(String polylineId) {
+    return polylineId.replaceFirst("^polyline_", "");
+  }
+
   /**
    * Create polyline
    * @param args
@@ -157,8 +161,10 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     }
     pluginMap.objects.remove(id);
 
-    id = "polyline_bounds_" + polylineHashCode;
-    pluginMap.objects.remove(id);
+    String hashCode = this.getPolylineHashCode(id);
+
+    String boundPropertyKey = "polyline_bounds_" + hashCode;
+    pluginMap.objects.remove(boundPropertyKey);
 
     String propertyKey = "polyline_property_" + polylineHashCode;
     pluginMap.objects.remove(propertyKey);
@@ -178,7 +184,9 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
 
     final Polyline polyline = this.getPolyline(id);
     // Recalculate the polygon bounds
-    final String propertyId = "polyline_bounds_" + polylineHashCode;
+    String hashCode = this.getPolylineHashCode(id);
+    final String propertyId = "polyline_bounds_" + hashCode;
+
 
     cordova.getActivity().runOnUiThread(new Runnable() {
       @Override
@@ -208,7 +216,8 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
     final Polyline polyline = this.getPolyline(id);
 
     // Recalculate the polygon bounds
-    final String propertyId = "polyline_bounds_" + polylineHashCode;
+    String hashCode = this.getPolylineHashCode(id);
+    final String propertyId = "polyline_bounds_" + hashCode;
 
     cordova.getActivity().runOnUiThread(new Runnable() {
       @Override
@@ -239,7 +248,8 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
 
 
     // Recalculate the polygon bounds
-    final String propertyId = "polyline_bounds_" + polylineHashCode;
+    String hashCode = this.getPolylineHashCode(id);
+    final String propertyId = "polyline_bounds_" + hashCode;
 
     cordova.getActivity().runOnUiThread(new Runnable() {
       @Override
@@ -264,6 +274,10 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
 
     final Polyline polyline = this.getPolyline(id);
 
+    // Recalculate the polygon bounds
+    String hashCode = this.getPolylineHashCode(id);
+    String propertyId = "polyline_bounds_" + hashCode;
+
     cordova.getActivity().runOnUiThread(new Runnable() {
       @Override
       public void run() {
@@ -271,8 +285,6 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
         if (path.size() > index) {
           path.set(index, latLng);
 
-          // Recalculate the polygon bounds
-          String propertyId = "polyline_bounds_" + polylineHashCode;
           pluginMap.objects.put(propertyId, PluginUtil.getBoundsFromPath(path));
 
           polyline.setPoints(path);
@@ -312,7 +324,8 @@ public class PluginPolyline extends MyPlugin implements MyPluginInterface  {
         polyline.setVisible(isVisible);
       }
     });
-    String propertyId = "polyline_property_" + polylineHashCode;
+    String hashCode = this.getPolylineHashCode(id);
+    String propertyId = "polyline_property_" + hashCode;
     JSONObject properties = (JSONObject)pluginMap.objects.get(propertyId);
     properties.put("isVisible", isVisible);
     pluginMap.objects.put(propertyId, properties);
