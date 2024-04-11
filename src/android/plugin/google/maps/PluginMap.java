@@ -191,8 +191,6 @@ public class PluginMap extends MyPlugin implements OnMarkerClickListener,
               || ( controls.has("myLocation") && controls.getBoolean("myLocation") )
       ) {
 
-
-
         // Request geolocation permission.
         boolean locationPermission = PermissionChecker.checkSelfPermission(cordova.getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
         //Log.d(TAG, "---> (235) hasPermission =  " + locationPermission);
@@ -618,9 +616,6 @@ public class PluginMap extends MyPlugin implements OnMarkerClickListener,
       plugins.put(pluginName, pluginEntry);
       mapCtrl.pluginManager.addService(pluginEntry);
 
-      plugin.privateInitialize(pluginName, cordova, webView, null);
-
-      plugin.initialize(cordova, webView);
       ((MyPluginInterface)plugin).setPluginMap(PluginMap.this);
       MyPlugin myPlugin = (MyPlugin) plugin;
       myPlugin.self = (MyPlugin)plugin;
@@ -671,8 +666,6 @@ public class PluginMap extends MyPlugin implements OnMarkerClickListener,
       pluginMap = PluginMap.this;
       pluginMap.mapCtrl.pluginManager.addService(pluginEntry);
 
-      plugin.privateInitialize(className, cordova, webView, null);
-      plugin.initialize(cordova, webView);
       ((MyPluginInterface)plugin).setPluginMap(PluginMap.this);
       pluginEntry.plugin.execute("create", args, callbackContext);
 
@@ -911,6 +904,7 @@ public class PluginMap extends MyPlugin implements OnMarkerClickListener,
       e.printStackTrace();
     }
   }
+
 
   @SuppressLint("WrongConstant")
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -1860,16 +1854,17 @@ public class PluginMap extends MyPlugin implements OnMarkerClickListener,
           catch (InterruptedException e) {
             e.printStackTrace();
           }
+        }
+        locationPermission = PermissionChecker.checkSelfPermission(cordova.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
+
+        //Log.d(TAG, "---> (1720)setMyLocationEnabled, hasPermission =  " + locationPermission);
+
+        if (!locationPermission) {
+          callbackContext.error(PluginUtil.getPgmStrings(activity, "pgm_location_rejected_by_user"));
+          return;
+        }
+
       }
-      locationPermission = PermissionChecker.checkSelfPermission(cordova.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
-
-      //Log.d(TAG, "---> (1720)setMyLocationEnabled, hasPermission =  " + locationPermission);
-
-      if (!locationPermission) {
-        callbackContext.error(PluginUtil.getPgmStrings(activity,"pgm_location_rejected_by_user"));
-        return;
-      }
-
     }
 
     this.activity.runOnUiThread(new Runnable() {
@@ -1877,8 +1872,9 @@ public class PluginMap extends MyPlugin implements OnMarkerClickListener,
       @Override
       public void run() {
         try {
-          map.setMyLocationEnabled(isMyLocationEnabled);
-          map.getUiSettings().setMyLocationButtonEnabled(isMyLocationButtonEnabled);
+            map.setMyLocationEnabled(isMyLocationEnabled);
+            map.getUiSettings().setMyLocationButtonEnabled(isMyLocationButtonEnabled);
+
           //Log.d(TAG, "--->isMyLocationButtonEnabled = " + isMyLocationButtonEnabled + ", isMyLocationEnabled = " + isMyLocationEnabled);
           if (!isMyLocationEnabled && isMyLocationButtonEnabled) {
             dummyMyLocationButton.setVisibility(View.VISIBLE);
